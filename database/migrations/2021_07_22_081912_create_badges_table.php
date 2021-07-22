@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCommentsTable extends Migration
+class CreateBadgesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateCommentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('badges', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users','id')->cascadeOnDelete();
-            $table->foreignId('post_id')->constrained('posts','id')->cascadeOnDelete();
-            $table->text('body');
-            $table->enum('status',['like','non like']);
+            $table->string('name');
+            $table->string('type');
+            $table->integer('score')->default(0);
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('comments');
+        Schema::dropIfExists('badges');
     }
 }

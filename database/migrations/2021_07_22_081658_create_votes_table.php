@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTagsTable extends Migration
+class CreateVotesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateTagsTable extends Migration
      */
     public function up()
     {
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('votes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('post_id')->constrained('posts','id')->cascadeOnDelete();
-            $table->string('name');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->morphs('votable');
+            $table->integer('score')->default(0);
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ class CreateTagsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tags');
+        Schema::dropIfExists('votes');
     }
 }
