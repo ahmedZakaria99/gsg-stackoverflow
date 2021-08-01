@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\User\AnswersController;
+use App\Http\Controllers\User\QuestionsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [QuestionsController::class,'index']);
+Route::resource('/user/questions',QuestionsController::class);
+Route::resource('/user/answers',AnswersController::class);
