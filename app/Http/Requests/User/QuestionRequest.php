@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\Models\Tag;
 use Illuminate\Foundation\Http\FormRequest;
 
 class QuestionRequest extends FormRequest
@@ -24,10 +25,21 @@ class QuestionRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|int|exists:users,id',
             'title' => 'required|min:3|max:255',
             'description' => 'required|min:5|max:255',
-            'status' => 'required|in:close,open'
+            'status' => 'in:open,close',
+            'tags' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $tagsFromDB = Tag::pluck('name');
+                    $tagsFromRequest = explode(',', $value);
+                    foreach ($tagsFromRequest as $tag) {
+                        if (!in_array($tag, $tagsFromDB->toArray())) {
+                            $fail ('You cannot use ' . $tag . ' tag in your input');
+                        }
+                    }
+                }
+            ],
         ];
     }
 }

@@ -67,7 +67,8 @@
         <!-- End Aside -->
 
         <!--Start Main  -->
-    @yield('Content')
+
+    @yield('content')
 
     <!--End Main  -->
         <!--Start Notification -->

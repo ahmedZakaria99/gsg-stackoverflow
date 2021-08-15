@@ -25,10 +25,8 @@ class AnswerRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|int|exists:users,id',
             'question_id' => 'required|int|exists:questions,id',
             'content' => 'required|min:5|max:255',
-            'accepted' => 'required|in:' . Answer::ACCEPTED_FALSE . ',' . Answer::ACCEPTED_TRUE
         ];
     }
 }

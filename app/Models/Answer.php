@@ -13,6 +13,26 @@ class Answer extends Model
     const ACCEPTED_FALSE = 0;
 
     protected $fillable = [
-        'user_id', 'question_id', 'content', 'accepted'
+        'user_id', 'question_id', 'content'
     ];
+    public function question()
+    {
+        return $this->belongsTo(Question::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class,'commentable');
+    }
+
+    public function votes()
+    {
+        return $this->morphMany(Vote::class,'votable');
+    }
+
 }

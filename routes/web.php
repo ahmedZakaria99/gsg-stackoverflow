@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\User\AnswersController;
+use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\QuestionsController;
+use App\Models\Profile;
+use App\Models\Question;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,6 +18,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [QuestionsController::class,'index']);
-Route::resource('/user/questions',QuestionsController::class);
-Route::resource('/user/answers',AnswersController::class);
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+require __DIR__ . '/auth.php';
+
+Route::get('/profile/create', [ProfileController::class, 'create'])->name('profile.create');
+Route::post('/profile/store',[ProfileController::class, 'store'])->name('profile.store');
+Route::get('/profile/edit/{id}', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::put('/profile/update/{id}',[ProfileController::class, 'update'])->name('profile.update');
+Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
+
+Route::resource('questions', QuestionsController::class);
+Route::resource('answers', AnswersController::class)->middleware(['auth']);
