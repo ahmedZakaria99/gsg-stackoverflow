@@ -154,10 +154,12 @@
                                     <div
                                         class="media media-card media--card shadow-none mb-0 rounded-0 align-items-center bg-transparent">
                                         <div class="media-img media-img-xs flex-shrink-0 rounded-full mr-2">
-                                            <img src="images/img4.jpg" alt="avatar" class="rounded-full">
+                                            <img
+                                                src="{{$user->profile->image_url}}"
+                                                alt="avatar" class="rounded-full">
                                         </div>
                                         <div class="media-body p-0 border-left-0">
-                                            <h5 class="fs-14">{{ $user->name }}</h5>
+                                            <h5 class="fs-14">{{ $user ? $user->name : '' }}</h5>
                                         </div>
                                     </div>
                                 </a>
@@ -313,7 +315,7 @@
                                 <div class="bg-gray p-3 rounded-rounded">
                                     <h3 class="fs-17">Edit your profile</h3>
                                 </div>
-                                <form method="POST" action="{{ route('profile.update',$user->id) }}" class="pt-35px">
+                                <form method="POST" action="{{ route('profile.update',$user->id) }}" class="pt-35px" enctype="multipart/form-data">
                                     @csrf
                                     @method('put')
                                     <div class="settings-item mb-10px">
@@ -322,16 +324,21 @@
                                         <div class="row pt-4 align-items-center">
                                             <div class="col-lg-6">
                                                 <div class="edit-profile-photo d-flex flex-wrap align-items-center">
-                                                    <img src="images/team.jpg" alt="user avatar"
-                                                         class="profile-img mr-4">
+                                                    <img
+                                                        src="{{$user->profile->image_url}}"
+                                                        alt="user avatar"
+                                                        class="profile-img mr-4">
                                                     <div>
-                                                        <div class="file-upload-wrap file--upload-wrap">
-                                                            <input type="file" name="files[]"
-                                                                   class="multi file-upload-input" multiple>
+                                                        <div class="form-group">
+                                                            <input type="file" name="image"
+                                                                   class="form-control">
                                                             <span class="file-upload-text"><i
                                                                     class="la la-photo mr-2"></i>Upload Photo</span>
                                                         </div>
                                                         <p class="fs-14">Maximum file size: 10 MB.</p>
+                                                        @error('image')
+                                                        <p class="invalid-feedback">{{ $message }}</p>
+                                                        @enderror
                                                     </div>
                                                 </div><!-- end edit-profile-photo -->
                                             </div><!-- end col-lg-6 -->
@@ -340,7 +347,7 @@
                                                     <label class="fs-13 text-black lh-20 fw-medium">Display name</label>
                                                     <div class="form-group">
                                                         <input class="form-control form--control" type="text"
-                                                               name="name" value={{ $user->name }}>
+                                                               name="name" value={{ $user ? $user->name : '' }}>
                                                     </div>
                                                     @error('name')
                                                     <p class="text-danger">{{ $message }}</p>
@@ -351,7 +358,7 @@
                                                     <div class="form-group">
                                                         <input class="form-control form--control" type="text"
                                                                name="location"
-                                                               value="{{$user->profile->location}}">
+                                                               value="{{$user->profile ? $user->profile->location : ''}}">
                                                     </div>
                                                     @error('location')
                                                     <p class="text-danger">{{ $message }}</p>

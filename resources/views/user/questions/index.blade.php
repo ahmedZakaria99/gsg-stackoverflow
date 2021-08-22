@@ -77,29 +77,72 @@
                             </li>
                         </ul><!-- end ul -->
                     </nav><!-- end main-menu -->
-                    <form method="post" class="mr-4">
+                    <form action="{{ route('search') }}" method="GET" class="mr-4">
                         <div class="form-group mb-0">
-                            <input class="form-control form--control form--control-bg-gray" type="text" name="search"
-                                   placeholder="Type your search words...">
+                            <input class="form-control form--control form--control-bg-gray" type="text" name="word"
+                                   placeholder="Type your search words..." value="">
                             <button class="form-btn" type="button"><i class="la la-search"></i></button>
                         </div>
                     </form>
                     <div class="nav-right-button">
-                        <a href="{{ route('login') }}" class="btn theme-btn"><i class="la la-user mr-1"></i>Account</a>
-                    </div><!-- end nav-right-button -->
-                    @Auth
-{{--                        <div class="nav-right-button">--}}
-{{--                            <a href="{{ route('profile.show',\Illuminate\Support\Facades\Auth::id()) }}" class="btn theme-btn"><i class="la la-user mr-1"></i>My Profile</a>--}}
-{{--                        </div><!-- end nav-right-button -->--}}
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                             onclick="event.preventDefault();
+                        <ul class="user-action-wrap d-flex align-items-center">
+                            @Guest
+                                <li class="dropdown">
+                                    <div class="nav-right-button">
+                                        <a href="{{ route('login') }}" class="btn theme-btn theme-btn-outline mr-2"><i
+                                                class="la la-sign-in mr-1"></i> Login</a>
+                                        <a href="{{ route('register') }}" class="btn theme-btn"><i
+                                                class="la la-user mr-1"></i> Sign up</a>
+                                    </div><!-- end nav-right-button -->
+                                </li>
+                            @endguest
+                            @Auth
+                                <li class="dropdown user-dropdown">
+
+                                    <a class="nav-link dropdown-toggle dropdown--toggle pl-2" href="#"
+                                       id="userMenuDropdown"
+                                       role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <div
+                                            class="media media-card media--card shadow-none mb-0 rounded-0 align-items-center bg-transparent">
+                                            <div class="media-img media-img-xs flex-shrink-0 rounded-full mr-2">
+                                                <img
+                                                    src="{{ @\Illuminate\Support\Facades\Auth::user()->profile->image_url }}"
+                                                    alt="avatar"
+                                                    class="rounded-full">
+                                            </div>
+                                            <div class="media-body p-0 border-left-0">
+                                                <h5 class="fs-14">{{ @\Illuminate\Support\Facades\Auth::user()->name}}</h5>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu dropdown--menu dropdown-menu-right mt-3 keep-open"
+                                         aria-labelledby="userMenuDropdown">
+                                        <h6 class="dropdown-header">
+                                            Hi, {{ @\Illuminate\Support\Facades\Auth::user()->name }}</h6>
+                                        <div class="dropdown-divider border-top-gray mb-0"></div>
+                                        <div class="dropdown-item-list">
+                                            <a class="dropdown-item"
+                                               href="{{ route('profile.show',@\Illuminate\Support\Facades\Auth::id()) }}"><i
+                                                    class="la la-user mr-2"></i>Profile</a>
+                                            <a class="dropdown-item" href="notifications.html"><i
+                                                    class="la la-bell mr-2"></i>Notifications</a>
+                                            <a class="dropdown-item" href="referrals.html"><i
+                                                    class="la la-user-plus mr-2"></i>Referrals</a>
+                                            <a class="dropdown-item" href="setting.html"><i class="la la-gear mr-2"></i>Settings</a>
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
+                                                <x-dropdown-link :href="route('logout')"
+                                                                 onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form><!-- end nav-right-button -->
-                    @endauth
+                                                    {{ __('Log out') }}
+                                                </x-dropdown-link>
+                                            </form><!-- end nav-right-button -->
+                                        </div>
+                                    </div>
+                                </li>
+                            @endauth
+                        </ul>
+                    </div><!-- end nav-right-button -->
                 </div><!-- end menu-wrapper -->
             </div><!-- end col-lg-10 -->
         </div><!-- end row -->
@@ -350,8 +393,8 @@
                 <div class="question-main-bar border-left border-left-gray pb-50px">
                     <div class="filters pb-4 pl-3 d-flex align-items-center justify-content-between">
                         <div class="mr-3">
-                            <h3 class="fs-18 fw-medium">All Questions</h3>
-                            <p class="pt-1 fs-14 fw-medium lh-20">{{ $questions->count() }} questions</p>
+                            <h3 class="fs-18 fw-medium">{{ $title }}</h3>
+                            <p class="pt-1 fs-14 fw-medium lh-20">{{ $questions->total() }} questions</p>
                         </div>
                         <div class="filter-option-box w-20">
                             <select class="select-container">
@@ -390,19 +433,23 @@
                                         <p class="mb-2 truncate lh-20 fs-15"></p>
                                         <div class="tags">
                                             @foreach($question->tags as $tag)
-                                                <a href="#" class="tag-link">{{ $tag->name }}</a>
+                                                <a href="{{ route('get-questions-related-to-tag',$tag->name) }}"
+                                                   class="tag-link">{{ $tag->name }}</a>
                                             @endforeach
                                         </div>
                                         <div
                                             class="media media-card user-media align-items-center px-0 border-bottom-0 pb-0">
-                                            <a href="user-profile.html" class="media-img d-block">
-                                                <img src="{{asset('assets/front/images/img3.jpg')}}" alt="avatar">
+                                            <a href="{{ route('profile.show',$question->user_id) }}"
+                                               class="media-img d-block">
+                                                <img
+                                                    src="{{ $question->user->profile->image_url }}"
+                                                    alt="avatar">
                                             </a>
                                             <div
                                                 class="media-body d-flex flex-wrap align-items-center justify-content-between">
                                                 <div>
                                                     <h5 class="pb-1"><a
-                                                            href="{{ route('profile.show',$question->user->id) }}">{{ $question->user->name }}</a>
+                                                            href="{{ route('profile.show',$question->user_id) }}">{{ $question->user->name }}</a>
                                                     </h5>
                                                     <div class="stats fs-12 d-flex align-items-center lh-18">
                                                         <span class="text-black pr-2"
@@ -430,39 +477,7 @@
                         @endisset
                     </div><!-- end questions-snippet -->
                     <div class="pager d-flex flex-wrap align-items-center justify-content-between pt-30px px-3">
-                        <div>
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination generic-pagination pr-1">
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Previous">
-                                            <span aria-hidden="true"><i class="la la-arrow-left"></i></span>
-                                            <span class="sr-only">Previous</span>
-                                        </a>
-                                    </li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Next">
-                                            <span aria-hidden="true"><i class="la la-arrow-right"></i></span>
-                                            <span class="sr-only">Next</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                            <p class="fs-13 pt-2">Showing 1-10 results of 50,577 questions</p>
-                        </div>
-                        <div class="filter-option-box w-20">
-                            <select class="select-container">
-                                <option selected="" value="10">10 per page</option>
-                                <option value="15">15 per page</option>
-                                <option value="20">20 per page</option>
-                                <option value="30">30 per page</option>
-                                <option value="40">40 per page</option>
-                                <option value="50">50 per page</option>
-                            </select>
-                        </div>
+                       {{ $questions->links() }}
                     </div>
                 </div><!-- end question-main-bar -->
             </div><!-- end col-lg-7 -->

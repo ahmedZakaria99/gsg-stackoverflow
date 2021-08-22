@@ -69,7 +69,8 @@
                                 </div>
                                 <div class="tags">
                                     @foreach($question->tags as $tag)
-                                        <a href="#" class="tag-link">{{ $tag->name }}</a>
+                                        <a href="{{ route('get-questions-related-to-tag',$tag->name) }}"
+                                           class="tag-link">{{ $tag->name }}</a>
                                     @endforeach
                                 </div>
                             </div>
@@ -92,16 +93,19 @@
                                 <p class="code-block custom-scrollbar-styled"> {{ $question->description }} </p>
                             </div><!-- end question-post-body -->
                             <div class="question-post-user-action">
-                                <div class="post-menu">
-                                    <a href="#" class="btn">Edit</a>
-                                </div><!-- end post-menu -->
+                                @if($question->user_id == @auth()->user()->id)
+                                    <div class="post-menu">
+                                        <a href="{{ route('questions.edit',$question->id) }}" class="btn">Edit</a>
+                                    </div><!-- end post-menu -->
+                                @endif
                                 <div class="media media-card user-media owner align-items-center">
-                                    <a href="user-profile.html" class="media-img d-block">
-                                        <img src="images/img3.jpg" alt="avatar">
+                                    <a href="{{ route('profile.show',$question->user_id) }}" class="media-img d-block">
+                                        <img src="{{ $question->user->profile->image_url }}" alt="avatar">
                                     </a>
                                     <div class="media-body d-flex flex-wrap align-items-center justify-content-between">
                                         <div>
-                                            <h5 class="pb-1"><a href="user-profile.html">{{ $question->user->name }}</a>
+                                            <h5 class="pb-1"><a
+                                                    href="{{ route('profile.show',$question->user_id) }}">{{ $question->user->name }}</a>
                                             </h5>
                                             <div class="stats fs-12 d-flex align-items-center lh-18">
                                                 <span class="text-black pr-2">224,110</span>
@@ -118,29 +122,6 @@
                                             <span
                                                 class="d-block lh-18 fs-12">{{$question->created_at->diffForHumans()}}</span>
                                         </small>
-                                    </div>
-                                </div><!-- end media -->
-                                <div class="media media-card user-media align-items-center">
-                                    <a href="user-profile.html" class="media-img d-block">
-                                        <img src="images/img4.jpg" alt="avatar">
-                                    </a>
-                                    <div class="media-body d-flex flex-wrap align-items-center justify-content-between">
-                                        <div>
-                                            <h5 class="pb-1"><a href="user-profile.html">Kevin Martin</a></h5>
-                                            <div class="stats fs-12 d-flex align-items-center lh-18">
-                                                <span class="text-black pr-2">6,514</span>
-                                                <span class="pr-2 d-inline-flex align-items-center"><span
-                                                        class="ball gold"></span>3</span>
-                                                <span class="pr-2 d-inline-flex align-items-center"><span
-                                                        class="ball silver"></span>35</span>
-                                                <span class="pr-2 d-inline-flex align-items-center"><span
-                                                        class="ball"></span>48</span>
-                                            </div>
-                                        </div>
-                                        <a href="revisions.html" class="meta d-block text-right fs-13 text-color">
-                                            <span class="d-block lh-18">edited</span>
-                                            <span class="d-block lh-18 fs-12">6 hours ago</span>
-                                        </a>
                                     </div>
                                 </div><!-- end media -->
                             </div><!-- end question-post-user-action -->
@@ -328,7 +309,7 @@
                                     <div id="vote2" class="upvotejs">
                                         <a class="upvote upvote-on" data-toggle="tooltip" data-placement="right"
                                            title="This question is useful"></a>
-                                        <span class="count">2</span>
+                                        <span class="count">1</span>
                                         <a class="downvote" data-toggle="tooltip" data-placement="right"
                                            title="This question is not useful"></a>
                                         <a class="star check star-on" data-toggle="tooltip" data-placement="right"
@@ -341,16 +322,21 @@
                                         <p class="code-block custom-scrollbar-styled">{{$answer->content}}</p>
                                     </div><!-- end answer-body -->
                                     <div class="question-post-user-action">
-                                        <div class="post-menu">
-                                            <a href="#" class="btn">Edit</a>
-                                        </div><!-- end post-menu -->
+                                        @if($answer->user_id == @auth()->user()->id)
+                                            <div class="post-menu">
+                                                <a href="{{ route('answers.edit',$answer->id) }}" class="btn">Edit</a>
+                                            </div><!-- end post-menu -->
+                                        @endif
                                         <div class="media media-card user-media align-items-center">
-                                            <a href="user-profile.html" class="media-img d-block">
-                                                <img src="images/img4.jpg" alt="avatar">
+                                            <a href="{{ route('profile.show',$answer->user_id) }}"
+                                               class="media-img d-block">
+                                                <img src="{{ $answer->user->profile->image_url }}" alt="avatar">
                                             </a>
                                             <div class="media-body d-flex align-items-center justify-content-between">
                                                 <div>
-                                                    <h5 class="pb-1"><a href="user-profile.html">Majed Badawi</a></h5>
+                                                    <h5 class="pb-1"><a
+                                                            href="{{ route('profile.show',$answer->user_id) }}">{{ $answer->user->name }}</a>
+                                                    </h5>
                                                     <div class="stats fs-12 d-flex align-items-center lh-18">
                                                         <span class="text-black pr-2">15.5k</span>
                                                         <span class="pr-2 d-inline-flex align-items-center"><span

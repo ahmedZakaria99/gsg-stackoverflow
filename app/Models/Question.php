@@ -13,6 +13,19 @@ class Question extends Model
         'user_id', 'title', 'description', 'status'
     ];
 
+    public function getTitleAttribute($value)
+    {
+        if (($this->status) == 'close') {
+          return $value . ' [closed]';
+        }
+        return $value;
+    }
+
+    public function getOriginalTitleAttribute()
+    {
+        return $this->attributes['title'];
+    }
+
     public function answers()
     {
         return $this->hasMany(Answer::class, 'question_id', 'id');
@@ -37,11 +50,11 @@ class Question extends Model
 
     public function comments()
     {
-        return $this->morphMany(Comment::class,'commentable');
+        return $this->morphMany(Comment::class, 'commentable');
     }
 
     public function votes()
     {
-        return $this->morphMany(Vote::class,'votable');
+        return $this->morphMany(Vote::class, 'votable');
     }
 }

@@ -26,6 +26,7 @@ class ProfileRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'image_path' => 'nullable|image',
         ];
     }
 }

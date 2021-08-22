@@ -154,29 +154,38 @@
                                     <div
                                         class="media media-card media--card shadow-none mb-0 rounded-0 align-items-center bg-transparent">
                                         <div class="media-img media-img-xs flex-shrink-0 rounded-full mr-2">
-                                            <img src="images/img4.jpg" alt="avatar" class="rounded-full">
+                                            <img src="{{ $user->profile->image_url }}" alt="avatar"
+                                                 class="rounded-full">
                                         </div>
                                         <div class="media-body p-0 border-left-0">
                                             <h5 class="fs-14">{{ $user->name }}</h5>
                                         </div>
                                     </div>
                                 </a>
-                                <div class="dropdown-menu dropdown--menu dropdown-menu-right mt-3 keep-open"
-                                     aria-labelledby="userMenuDropdown">
-                                    <h6 class="dropdown-header">Hi, Arden Smith</h6>
-                                    <div class="dropdown-divider border-top-gray mb-0"></div>
-                                    <div class="dropdown-item-list">
-                                        <a class="dropdown-item" href="user-profile.html"><i
-                                                class="la la-user mr-2"></i>Profile</a>
-                                        <a class="dropdown-item" href="notifications.html"><i
-                                                class="la la-bell mr-2"></i>Notifications</a>
-                                        <a class="dropdown-item" href="referrals.html"><i
-                                                class="la la-user-plus mr-2"></i>Referrals</a>
-                                        <a class="dropdown-item" href="setting.html"><i class="la la-gear mr-2"></i>Settings</a>
-                                        <a class="dropdown-item" href="index.html"><i class="la la-power-off mr-2"></i>Log
-                                            out</a>
+                                @if($user->id == \Illuminate\Support\Facades\Auth::id())
+                                    <div class="dropdown-menu dropdown--menu dropdown-menu-right mt-3 keep-open"
+                                         aria-labelledby="userMenuDropdown">
+                                        <h6 class="dropdown-header">Hi, {{ $user->name }}</h6>
+                                        <div class="dropdown-divider border-top-gray mb-0"></div>
+                                        <div class="dropdown-item-list">
+                                            <a class="dropdown-item" href="#"><i
+                                                    class="la la-user mr-2"></i>Profile</a>
+                                            <a class="dropdown-item" href="notifications.html"><i
+                                                    class="la la-bell mr-2"></i>Notifications</a>
+                                            <a class="dropdown-item" href="referrals.html"><i
+                                                    class="la la-user-plus mr-2"></i>Referrals</a>
+                                            <a class="dropdown-item" href="setting.html"><i class="la la-gear mr-2"></i>Settings</a>
+                                            <form method="POST" action="{{ route('logout') }}">
+                                                @csrf
+                                                <x-dropdown-link :href="route('logout')"
+                                                                 onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                                                    {{ __('Log out') }}
+                                                </x-dropdown-link>
+                                            </form><!-- end nav-right-button -->
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
                             </li>
                         </ul>
                     </div><!-- end nav-right-button -->
@@ -311,7 +320,7 @@
                 <div class="hero-content">
                     <div class="media media-card align-items-center shadow-none p-0 mb-0 rounded-0 bg-transparent">
                         <div class="media-img media--img">
-                            <img src="images/img4.jpg" alt="avatar">
+                            <img src="{{$user->profile->image_url}}" alt="avatar">
                         </div>
                         <div class="media-body">
                             <h5>{{$user->name}}</h5>

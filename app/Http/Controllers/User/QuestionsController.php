@@ -9,6 +9,7 @@ use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class QuestionsController extends Controller
 {
@@ -19,9 +20,10 @@ class QuestionsController extends Controller
 
     public function index()
     {
-        $questions = Question::with(['answers', 'tags'])->paginate();
+        $questions = Question::with(['answers', 'tags', 'user'])->paginate(2);
         return view('user.questions.index', [
-            'questions' => $questions
+            'questions' => $questions,
+            'title' => 'All Questions'
         ]);
     }
 
@@ -32,7 +34,7 @@ class QuestionsController extends Controller
     }
 
 
-    public function store(QuestionRequest $request)
+    public function store(Request $request)
     {
         $question = Question::create([
             'title' => $request->post('title'),
@@ -40,11 +42,8 @@ class QuestionsController extends Controller
             'status' => $request->post('status'),
             'user_id' => Auth::id()
         ]);
-        // save tags at pivot table
-        $tagsFromRequest = explode(',', $request->post('tags'));
-        foreach ($tagsFromRequest as $tag) {
-            $tagIds[] = Tag::where('name', $tag)->pluck('id')->first();
-        }
+
+        $tagIds = $this->saveTagsInPivotTable($request->post('tags'));
         $question->tags()->attach($tagIds);
 
         return redirect()->route('questions.index');
@@ -64,7 +63,7 @@ class QuestionsController extends Controller
 
     public function edit($id)
     {
-        $question = Question::findOrFail($id);
+        $question = Question::with('tags')->findOrFail($id);
         return view('user.questions.edit', [
             'question' => $question,
         ]);
@@ -73,8 +72,15 @@ class QuestionsController extends Controller
     public function update(QuestionRequest $request, $id)
     {
         $question = Question::findOrFail($id);
-        $question->update($request->all());
-        return redirect()->route('questions.index');
+        $question->update([
+            'title' => $request->post('title'),
+            'description' => $request->post('description'),
+            'status' => $request->post('status'),
+        ]);
+        $tagIds = $this->saveTagsInPivotTable($request->post('tags'));
+        $question->tags()->attach($tagIds);
+
+        return redirect()->route('questions.show', $id);
     }
 
     public function destroy($id)
@@ -82,5 +88,45 @@ class QuestionsController extends Controller
         $question = Question::findOrFail($id);
         $question->delete();
         return redirect()->route('questions.index');
+    }
+
+    public function getAllQuestionsRelatedToThisTag($name)
+    {
+        $questions = Question::with(['tags', 'answers', 'user'])
+            ->whereHas('tags', function ($query) use ($name) {
+                $query->where('name', $name);
+            })->paginate(2);
+        return view('user.questions.index', [
+            'questions' => $questions,
+            'title' => "Questions tagged [$name]"
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'word' => 'required'
+        ]);
+        $word = $request->post('word');
+        $questions = Question::with(['answers', 'tags', 'user'])
+            ->where('title', 'like', "%$word%")
+            ->orWhereHas('tags', function ($query) use ($word) {
+                $query->where('name', $word);
+            })
+            ->paginate(2);
+
+        return view('user.questions.index', [
+            'questions' => $questions,
+            'title' => "Questions Related [$word]"
+        ]);
+    }
+
+    public function saveTagsInPivotTable($tagsAsString)
+    {
+        $tagsFromRequest = explode(',', $tagsAsString);
+        foreach ($tagsFromRequest as $tag) {
+            $tagIds[] = Tag::where('name', $tag)->pluck('id')->first();
+        }
+        return $tagIds;
     }
 }
