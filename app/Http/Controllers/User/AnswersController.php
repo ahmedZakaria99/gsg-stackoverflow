@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\AnswerRequest;
 use App\Models\Answer;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,11 +24,16 @@ class AnswersController extends Controller
 
     public function store(AnswerRequest $request)
     {
-        $request->merge([
-            'user_id' => Auth::id(),
-        ]);
-        $answer = Answer::create($request->all());
-        return redirect()->route('questions.show', $answer->question_id);
+        $id = $request->post('question_id');
+        $question = Question::findOrFail($id);
+        if ($question->status == "open") {
+            $request->merge([
+                'user_id' => Auth::id(),
+            ]);
+            $answer = Answer::create($request->all());
+            return redirect()->route('questions.show', $answer->question_id);
+        } else
+            return redirect()->back();
 
     }
 
@@ -39,16 +45,22 @@ class AnswersController extends Controller
     public function edit($id)
     {
         $answer = Answer::findOrFail($id);
-        return view('user.answers.edit',[
-            'answer' => $answer
-        ]);
+        if ($answer->user->id == Auth::id()) {
+            return view('user.answers.edit', [
+                'answer' => $answer
+            ]);
+        } else
+            return redirect()->back();
     }
 
     public function update(AnswerRequest $request, $id)
     {
         $answer = Answer::findOrFail($id);
-        $answer->update($request->all());
-        return redirect()->route('questions.show', $answer->question_id);
+        if ($answer->user->id == Auth::id()) {
+            $answer->update($request->all());
+            return redirect()->route('questions.show', $answer->question_id);
+        } else
+            return redirect()->back();
     }
 
 

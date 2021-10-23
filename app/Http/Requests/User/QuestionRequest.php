@@ -33,7 +33,7 @@ class QuestionRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $tagsFromDB = Tag::pluck('name');
                     $tagsFromRequest = explode(',', $value);
-                    foreach ($tagsFromRequest as $tag) {
+                    foreach (str_replace(' ','',$tagsFromRequest) as $tag) {
                         if (!in_array($tag, $tagsFromDB->toArray())) {
                             $fail ('You cannot use ' . $tag . ' tag in your input');
                         }

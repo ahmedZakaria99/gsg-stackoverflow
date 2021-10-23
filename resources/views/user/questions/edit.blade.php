@@ -200,7 +200,8 @@
                             </div>
                             <div class="form-group">
                                 <input class="input-tags input--tags" type="text" name="tags"
-                                       placeholder="e.g. javascript" value="">
+                                       placeholder="e.g. javascript"
+                                       value="@foreach($question->tags->pluck('name') as $tag){{$tag}}@if(!$loop->last),@endif @endforeach">
                                 @error('tags')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror

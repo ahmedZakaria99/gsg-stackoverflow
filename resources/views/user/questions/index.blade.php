@@ -422,7 +422,8 @@
                                             <span class="answer-text d-block fs-13 lh-18">answers</span>
                                         </div>
                                         <div class="view-block">
-                                            <span class="view-counts d-block lh-20 fw-medium">12</span>
+                                            <span
+                                                class="view-counts d-block lh-20 fw-medium">{{$question->views}}</span>
                                             <span class="view-text d-block fs-13 lh-18">views</span>
                                         </div>
                                     </div>
@@ -477,7 +478,7 @@
                         @endisset
                     </div><!-- end questions-snippet -->
                     <div class="pager d-flex flex-wrap align-items-center justify-content-between pt-30px px-3">
-                       {{ $questions->links() }}
+                        {{ $questions->links() }}
                     </div>
                 </div><!-- end question-main-bar -->
             </div><!-- end col-lg-7 -->

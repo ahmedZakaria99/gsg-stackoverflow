@@ -64,7 +64,7 @@
                                     </div>
                                     <div class="pr-3">
                                         <span class="pr-1">Viewed</span>
-                                        <span class="text-black">89 times</span>
+                                        <span class="text-black">{{ $question->views }} times</span>
                                     </div>
                                 </div>
                                 <div class="tags">
@@ -79,7 +79,7 @@
                     <div class="question d-flex">
                         <div class="votes votes-styled w-auto">
                             <div id="vote" class="upvotejs">
-                                <a class="upvote upvote-on" data-toggle="tooltip" data-placement="right"
+                                <a type="submit" class="upvote upvote-on" data-toggle="tooltip" data-placement="right"
                                    title="This question is useful"></a>
                                 <span class="count">1</span>
                                 <a class="downvote" data-toggle="tooltip" data-placement="right"
@@ -127,73 +127,21 @@
                             </div><!-- end question-post-user-action -->
                             <div class="comments-wrap">
                                 <ul class="comments-list">
-                                    <li>
-                                        <div class="comment-actions">
-                                            <span class="comment-score">1</span>
-                                        </div>
-                                        <div class="comment-body">
-                                            <span class="comment-copy">Where are you trying to get <code class="code">prodId</code>?</span>
-                                            <span class="comment-separated">-</span>
-                                            <a href="user-profile.html" class="comment-user" title="15,467 reputation">Majed
-                                                Badawi</a>
-                                            <span class="comment-separated">-</span>
-                                            <a href="#" class="comment-date">8 hours ago</a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="comment-actions">
-                                            <span class="comment-score"></span>
-                                        </div>
-                                        <div class="comment-body">
-                                            <span class="comment-copy">In a separate js file.  @MajedBadawi</span>
-                                            <span class="comment-separated">-</span>
-                                            <a href="user-profile.html" class="comment-user owner"
-                                               title="224,110 reputation">Arden Smith</a>
-                                            <span class="comment-separated">-</span>
-                                            <a href="#" class="comment-date">8 hours ago</a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="comment-actions">
-                                            <span class="comment-score"></span>
-                                        </div>
-                                        <div class="comment-body">
-                                            <span class="comment-copy">@MajedBadawi I just updated the code to show where I'm trying to get it.</span>
-                                            <span class="comment-separated">-</span>
-                                            <a href="user-profile.html" class="comment-user owner"
-                                               title="224,110 reputation">Arden Smith</a>
-                                            <span class="comment-separated">-</span>
-                                            <a href="#" class="comment-date">8 hours ago</a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="comment-actions">
-                                            <span class="comment-score"></span>
-                                        </div>
-                                        <div class="comment-body">
-                                            <span class="comment-copy">Your are missing quotes <code
-                                                    class="code"></code> Your markup breaks after that</span>
-                                            <span class="comment-separated">-</span>
-                                            <a href="user-profile.html" class="comment-user" title="6,514 reputation">Kevin
-                                                Martin</a>
-                                            <span class="comment-separated">-</span>
-                                            <a href="#" class="comment-date">8 hours ago</a>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="comment-actions">
-                                            <span class="comment-score"></span>
-                                        </div>
-                                        <div class="comment-body">
-                                            <span class="comment-copy">This doesn't work either: <code
-                                                    class="code"></code>. @Kevin Martin</span>
-                                            <span class="comment-separated">-</span>
-                                            <a href="user-profile.html" class="comment-user owner"
-                                               title="224,110 reputation">Arden Smith</a>
-                                            <span class="comment-separated">-</span>
-                                            <a href="#" class="comment-date">8 hours ago</a>
-                                        </div>
-                                    </li>
+                                    @if($question->comments->count() > 0)
+                                        @foreach($question->comments as $comment)
+                                            <li>
+                                                <div class="comment-body">
+                                                    <span class="comment-copy">{{ $comment->content }}</span>
+                                                    <a href="{{ route('profile.show',$question->user_id) }}"
+                                                       class="comment-user"
+                                                       title="15,467 reputation">{{ $comment->user->name }}</a>
+                                                    <span class="comment-separated">-</span>
+                                                    <a href="#"
+                                                       class="comment-date">{{ $comment->created_at->diffForHumans() }}</a>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    @endif
                                 </ul>
                                 <div class="comment-form">
                                     <div class="comment-link-wrap text-center">
@@ -204,77 +152,28 @@
                                             a comment</a>
                                     </div>
                                     <div class="collapse border-top border-top-gray mt-2 pt-3" id="addCommentCollapse">
-                                        <form method="post" class="row pb-3">
+                                        <form action="{{route('comments.store','question')}}" method="post"
+                                              class="row pb-3">
+                                            @csrf
+                                            <input type="hidden" name="question_id" value="{{$question->id}}">
                                             <div class="col-lg-12">
                                                 <h4 class="fs-16 pb-2">Leave a Comment</h4>
                                                 <div class="divider mb-2"><span></span></div>
                                             </div><!-- end col-lg-12 -->
-                                            <div class="col-lg-6">
-                                                <div class="input-box">
-                                                    <label class="fs-13 text-black lh-20">Name</label>
-                                                    <div class="form-group">
-                                                        <input class="form-control form--control form-control-sm fs-13"
-                                                               type="text" name="text" placeholder="Your name">
-                                                    </div>
-                                                </div>
-                                            </div><!-- end col-lg-6 -->
-                                            <div class="col-lg-6">
-                                                <div class="input-box">
-                                                    <label class="fs-13 text-black lh-20">Email (Address never made
-                                                        public)</label>
-                                                    <div class="form-group">
-                                                        <input class="form-control form--control form-control-sm fs-13"
-                                                               type="text" name="text" placeholder="Your email">
-                                                    </div>
-                                                </div>
-                                            </div><!-- end col-lg-6 -->
                                             <div class="col-lg-12">
                                                 <div class="input-box">
-                                                    <label class="fs-13 text-black lh-20">Website</label>
-                                                    <div class="form-group">
-                                                        <input class="form-control form--control form-control-sm fs-13"
-                                                               type="text" name="text" placeholder="Website link">
-                                                    </div>
-                                                </div>
-                                            </div><!-- end col-lg-12 -->
-                                            <div class="col-lg-12">
-                                                <div class="input-box">
-                                                    <label class="fs-13 text-black lh-20">Message</label>
+                                                    <label class="fs-13 text-black lh-20">Comment</label>
                                                     <div class="form-group">
                                                         <textarea
                                                             class="form-control form--control form-control-sm fs-13"
-                                                            name="message" rows="5"
-                                                            placeholder="Your comment here..."></textarea>
-                                                        <div class="d-flex flex-wrap align-items-center pt-2">
-                                                            <div
-                                                                class="badge bg-gray border border-gray mr-3 fw-regular fs-13">
-                                                                [named hyperlinks] (https://example.com)
-                                                            </div>
-                                                            <div class="mr-3 fw-bold fs-13">**bold**</div>
-                                                            <div class="mr-3 font-italic fs-13">_italic_</div>
-                                                        </div>
+                                                            name="content" rows="5"
+                                                            placeholder="Your comment here...">{{old('content')}}</textarea>
                                                     </div>
                                                 </div>
                                             </div><!-- end col-lg-12 -->
                                             <div class="col-lg-12">
                                                 <div
                                                     class="input-box d-flex flex-wrap align-items-center justify-content-between">
-                                                    <div>
-                                                        <div class="custom-control custom-checkbox fs-13">
-                                                            <input type="checkbox" class="custom-control-input"
-                                                                   id="getNewComments">
-                                                            <label class="custom-control-label custom--control-label"
-                                                                   for="getNewComments">Notify me of new comments vai
-                                                                email.</label>
-                                                        </div>
-                                                        <div class="custom-control custom-checkbox fs-13">
-                                                            <input type="checkbox" class="custom-control-input"
-                                                                   id="getNewPosts">
-                                                            <label class="custom-control-label custom--control-label"
-                                                                   for="getNewPosts">Notify me of new posts vai
-                                                                email.</label>
-                                                        </div>
-                                                    </div>
                                                     <button
                                                         class="btn theme-btn theme-btn-sm theme-btn-outline theme-btn-outline-gray"
                                                         type="submit">Post Comment
@@ -349,125 +248,64 @@
                                                 </div>
                                                 <small class="meta d-block text-right">
                                                     <span class="text-black d-block lh-18">answered</span>
-                                                    <span class="d-block lh-18 fs-12">8 hours ago</span>
+                                                    <span
+                                                        class="d-block lh-18 fs-12">{{ $answer->created_at->diffForHumans() }}</span>
                                                 </small>
-                                            </div>
-                                        </div><!-- end media -->
-                                        <div class="media media-card user-media align-items-center">
-                                            <div class="media-body d-flex align-items-center justify-content-end">
-                                                <a href="revisions.html"
-                                                   class="meta d-block text-right fs-13 text-color">
-                                                    <span class="d-block lh-18">edited</span>
-                                                    <span class="d-block lh-18 fs-12">8 hours ago</span>
-                                                </a>
                                             </div>
                                         </div><!-- end media -->
                                     </div><!-- end question-post-user-action -->
                                     <div class="comments-wrap">
                                         <ul class="comments-list">
-                                            <li>
-                                                <div class="comment-actions">
-                                                    <span class="comment-score">1</span>
-                                                </div>
-                                                <div class="comment-body">
-                                                    <span class="comment-copy">Ah excellent! Thank you!</span>
-                                                    <span class="comment-separated">-</span>
-                                                    <a href="user-profile.html" class="comment-user owner"
-                                                       title="224,110 reputation">Arden Smith</a>
-                                                    <span class="comment-separated">-</span>
-                                                    <a href="#" class="comment-date">8 hours ago</a>
-                                                </div>
-                                            </li>
+                                            @if($answer->comments->count() > 0)
+                                                @foreach($answer->comments as $comment)
+                                                    <li>
+                                                        <div class="comment-body">
+                                                                <span
+                                                                    class="comment-copy">{{ $comment->content }}</span>
+                                                            <a href="{{ route('profile.show',$question->user_id) }}"
+                                                               class="comment-user"
+                                                               title="15,467 reputation">{{ $comment->user->name }}</a>
+                                                            <span class="comment-separated">-</span>
+                                                            <a href="#"
+                                                               class="comment-date">{{ $comment->created_at->diffForHumans() }}</a>
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            @endif
                                         </ul>
                                         <div class="comment-form">
                                             <div class="comment-link-wrap text-center">
                                                 <a class="collapse-btn comment-link" data-toggle="collapse"
-                                                   href="#addCommentCollapseTwo" role="button" aria-expanded="false"
-                                                   aria-controls="addCommentCollapseTwo"
+                                                   href="#addCommentCollapse" role="button" aria-expanded="false"
+                                                   aria-controls="addCommentCollapse"
                                                    title="Use comments to ask for more information or suggest improvements. Avoid answering questions in comments.">Add
                                                     a comment</a>
                                             </div>
                                             <div class="collapse border-top border-top-gray mt-2 pt-3"
-                                                 id="addCommentCollapseTwo">
-                                                <form method="post" class="row pb-3">
+                                                 id="addCommentCollapse">
+                                                <form action="{{route('comments.store','answer')}}" method="post"
+                                                      class="row pb-3">
+                                                    @csrf
+                                                    <input type="hidden" name="question_id" value="{{ $question->id }}">
+                                                    <input type="hidden" name="answer_id" value="{{$answer->id}}">
                                                     <div class="col-lg-12">
                                                         <h4 class="fs-16 pb-2">Leave a Comment</h4>
                                                         <div class="divider mb-2"><span></span></div>
                                                     </div><!-- end col-lg-12 -->
-                                                    <div class="col-lg-6">
-                                                        <div class="input-box">
-                                                            <label class="fs-13 text-black lh-20">Name</label>
-                                                            <div class="form-group">
-                                                                <input
-                                                                    class="form-control form--control form-control-sm fs-13"
-                                                                    type="text" name="text" placeholder="Your name">
-                                                            </div>
-                                                        </div>
-                                                    </div><!-- end col-lg-6 -->
-                                                    <div class="col-lg-6">
-                                                        <div class="input-box">
-                                                            <label class="fs-13 text-black lh-20">Email (Address never
-                                                                made
-                                                                public)</label>
-                                                            <div class="form-group">
-                                                                <input
-                                                                    class="form-control form--control form-control-sm fs-13"
-                                                                    type="text" name="text" placeholder="Your email">
-                                                            </div>
-                                                        </div>
-                                                    </div><!-- end col-lg-6 -->
                                                     <div class="col-lg-12">
                                                         <div class="input-box">
-                                                            <label class="fs-13 text-black lh-20">Website</label>
-                                                            <div class="form-group">
-                                                                <input
-                                                                    class="form-control form--control form-control-sm fs-13"
-                                                                    type="text" name="text" placeholder="Website link">
-                                                            </div>
-                                                        </div>
-                                                    </div><!-- end col-lg-12 -->
-                                                    <div class="col-lg-12">
-                                                        <div class="input-box">
-                                                            <label class="fs-13 text-black lh-20">Message</label>
+                                                            <label class="fs-13 text-black lh-20">Comment</label>
                                                             <div class="form-group">
                                                         <textarea
                                                             class="form-control form--control form-control-sm fs-13"
-                                                            name="message" rows="5"
-                                                            placeholder="Your comment here..."></textarea>
-                                                                <div class="d-flex flex-wrap align-items-center pt-2">
-                                                                    <div
-                                                                        class="badge bg-gray border border-gray mr-3 fw-regular fs-13">
-                                                                        [named hyperlinks] (https://example.com)
-                                                                    </div>
-                                                                    <div class="mr-3 fw-bold fs-13">**bold**</div>
-                                                                    <div class="mr-3 font-italic fs-13">_italic_</div>
-                                                                </div>
+                                                            name="content" rows="5"
+                                                            placeholder="Your comment here...">{{old('content')}}</textarea>
                                                             </div>
                                                         </div>
                                                     </div><!-- end col-lg-12 -->
                                                     <div class="col-lg-12">
                                                         <div
                                                             class="input-box d-flex flex-wrap align-items-center justify-content-between">
-                                                            <div>
-                                                                <div class="custom-control custom-checkbox fs-13">
-                                                                    <input type="checkbox" class="custom-control-input"
-                                                                           id="getNewCommentsTwo">
-                                                                    <label
-                                                                        class="custom-control-label custom--control-label"
-                                                                        for="getNewCommentsTwo">Notify me of new
-                                                                        comments
-                                                                        vai
-                                                                        email.</label>
-                                                                </div>
-                                                                <div class="custom-control custom-checkbox fs-13">
-                                                                    <input type="checkbox" class="custom-control-input"
-                                                                           id="getNewPostsTwo">
-                                                                    <label
-                                                                        class="custom-control-label custom--control-label"
-                                                                        for="getNewPostsTwo">Notify me of new posts vai
-                                                                        email.</label>
-                                                                </div>
-                                                            </div>
                                                             <button
                                                                 class="btn theme-btn theme-btn-sm theme-btn-outline theme-btn-outline-gray"
                                                                 type="submit">Post Comment

@@ -10,12 +10,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use function Symfony\Component\String\s;
 
 class QuestionsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth'])->except('index');
+        $this->middleware(['auth'])->except(['index', 'show']);
     }
 
     public function index()
@@ -34,7 +35,7 @@ class QuestionsController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(QuestionRequest $request)
     {
         $question = Question::create([
             'title' => $request->post('title'),
@@ -52,8 +53,36 @@ class QuestionsController extends Controller
 
     public function show($id)
     {
-        $question = Question::with(['answers', 'tags'])->findOrFail($id);
+        $question = Question::with(['answers', 'tags', 'comments'])->findOrFail($id);
         $numberOfUsers = User::count();
+        if (session()->has('isVisited')) {
+            if (!(session()->get('isVisited')[0] == Auth::id() && session()->get('isVisited')[1] == $question->id)) {
+                session()->put('isVisited', [Auth::id(), $question->id]);
+                $question->increment('views');
+            }
+
+        } else {
+            session()->put('isVisited', [Auth::id(), $question->id]);
+            $question->increment('views');
+        }
+        /*
+         * if (session()->has('isVisited')) {
+            $item_exist = null;
+            foreach (session()->get('isVisited') as $item) {
+                if (($item[0] == Auth::id() && $item[1] == $question->id)) {
+                    $item_exist = $item;
+                    break;
+                }
+            }
+            if ($item_exist == null) {
+                session()->push('isVisited', [Auth::id(), $question->id]);
+                $question->increment('views');
+            }
+        } else {
+            session()->push('isVisited', [Auth::id(), $question->id]);
+            $question->increment('views');
+        }
+         */
         return view('user.questions.details', [
             'question' => $question,
             'numberOfUsers' => $numberOfUsers
@@ -64,23 +93,29 @@ class QuestionsController extends Controller
     public function edit($id)
     {
         $question = Question::with('tags')->findOrFail($id);
-        return view('user.questions.edit', [
-            'question' => $question,
-        ]);
+        if ($question->user->id == Auth::id()) {
+            return view('user.questions.edit', [
+                'question' => $question,
+            ]);
+        } else
+            return redirect()->back();
     }
 
     public function update(QuestionRequest $request, $id)
     {
         $question = Question::findOrFail($id);
-        $question->update([
-            'title' => $request->post('title'),
-            'description' => $request->post('description'),
-            'status' => $request->post('status'),
-        ]);
-        $tagIds = $this->saveTagsInPivotTable($request->post('tags'));
-        $question->tags()->attach($tagIds);
+        if ($question->user->id == Auth::id()) {
+            $question->update([
+                'title' => $request->post('title'),
+                'description' => $request->post('description'),
+                'status' => $request->post('status'),
+            ]);
+            $tagIds = $this->saveTagsInPivotTable($request->post('tags'));
+            $question->tags()->sync($tagIds);
 
-        return redirect()->route('questions.show', $id);
+            return redirect()->route('questions.show', $id);
+        } else
+            return redirect()->back();
     }
 
     public function destroy($id)
@@ -107,7 +142,7 @@ class QuestionsController extends Controller
         $request->validate([
             'word' => 'required'
         ]);
-        $word = $request->post('word');
+        $word = $request->get('word');
         $questions = Question::with(['answers', 'tags', 'user'])
             ->where('title', 'like', "%$word%")
             ->orWhereHas('tags', function ($query) use ($word) {
@@ -124,7 +159,7 @@ class QuestionsController extends Controller
     public function saveTagsInPivotTable($tagsAsString)
     {
         $tagsFromRequest = explode(',', $tagsAsString);
-        foreach ($tagsFromRequest as $tag) {
+        foreach (str_replace(' ', '', $tagsFromRequest) as $tag) {
             $tagIds[] = Tag::where('name', $tag)->pluck('id')->first();
         }
         return $tagIds;
